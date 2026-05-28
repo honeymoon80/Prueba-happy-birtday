@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>💖 Para mi amor - Eterno Amor 💖</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;1,400;1,600&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: #fde8f0;
+            color: #7c3f6a;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Partículas y efectos flotantes */
+        #particlesCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .floating-heart {
+            position: fixed;
+            bottom: -40px;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: 9998;
+            animation: floatUp 8s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Pantalla de regalo inicial */
+        .gift-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 30% 30%, #fbcfe8, #e9d5ff);
+            transition: opacity 0.8s ease;
+        }
+
+        .gift-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 40px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(244,114,182,0.3);
+            border: 2px solid #fbb6ce;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .gift-card:active {
+            transform: scale(0.98);
+        }
+
+        .gift-emoji {
+            font-size: 5rem;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%,100%{ transform: translateY(0); }
+            50%{ transform: translateY(-15px); }
+        }
+
+        .gift-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: #be185d;
+            margin: 15px 0 10px;
+        }
+
+        .progress-bar-gift {
+            width: 100%;
+            height: 12px;
+            background: #fbcfe8;
+            border-radius: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill-gift {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #f472b6, #ec4899);
+            border-radius: 20px;
+            transition: width 0.2s;
+        }
+
+        .clicks-counter {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+        }
+
+        /* Pantalla principal (oculta inicialmente) */
+        .main-app {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* Barra de progreso global */
+        .global-progress {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            padding: 8px 15px;
+            border-radius: 30px;
+            z-index: 1000;
+            font-family: 'Dancing Script', cursive;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #fbb6ce;
+            text-align: center;
+        }
+
+        .global-progress span {
+            font-weight: bold;
+            color: #ec4899;
+        }
+
+        .global-bar-outer {
+            width: 150px;
+            height: 6px;
+            background: #fbcfe8;
+            border-radius: 10px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .global-bar-inner {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #f472b6, #ec4899);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        /* Menú de secciones */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 120px));
+            gap: 20px;
+            justify-content: center;
+            padding: 100px 20px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .menu-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(244,114,182,0.2);
+            border: 1px solid #fbb6ce;
+        }
+
+        .menu-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.3);
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .menu-card.locked::after {
+            content: "🔒";
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .menu-card:not(.locked):hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(244,114,182,0.3);
+        }
+
+        .menu-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            background: #fbcfe8;
+        }
+
+        .menu-card h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 0.9rem;
+            color: #be185d;
+        }
+
+        /* Reproductor global minimizado */
+        .global-player {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border: 1px solid #fbb6ce;
+            font-family: 'Dancing Script', cursive;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .global-player.minimized {
+            transform: translateX(calc(-100% + 50px));
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .player-controls button {
+            background: #f472b6;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Secciones modales */
+        .section-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .section-content {
+            background: #fff8f4;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 30px;
+            padding: 20px;
+            position: relative;
+            border: 3px solid #fbb6ce;
+        }
+
+        .close-section {
+            position: sticky;
+            top: 0;
+            right: 0;
+            float: right;
+            background: #ec4899;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Logros internos */
+        .achievement-panel {
+            background: #fde8f0;
+            border-radius: 20px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+        }
+
+        /* Carrusel básico */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            border-radius: 20px;
+            margin: 10px 0;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .carousel-slide.active {
+            display: block;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.7);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+        }
+
+        .carousel-prev { left: 10px; }
+        .carousel-next { right: 10px; }
+
+        /* Contador de la sección 13 */
+        .time-counter {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .time-unit {
+            background: #fbcfe8;
+            border-radius: 20px;
+            padding: 10px;
+            min-width: 70px;
+        }
+        .time-number {
+            font-size: 2rem;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        /* Adornos clickeables */
+        .deco-clickable {
+            display: inline-block;
+            margin: 5px;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .deco-clickable:hover {
+            transform: scale(1.2);
+        }
+
+        /* Canvas dibujo */
+        .draw-canvas {
+            border: 2px solid #f472b6;
+            border-radius: 10px;
+            background: white;
+            cursor: crosshair;
+        }
+
+        button {
+            background: #f472b6;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .menu-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .menu-card img { width: 50px; height: 50px; }
+            .global-progress { font-size: 0.7rem; top: 5px; right: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particlesCanvas"></canvas>
+
+<!-- Pantalla de regalo -->
+<div id="giftScreen" class="gift-screen">
+    <div class="gift-card" id="giftCard">
+        <div class="gift-emoji">🎁🎂</div>
+        <h1 class="gift-title">¡Feliz Cumpleaños, mi amor!</h1>
+        <p>Aprieta el regalo para abrirlo 💝</p>
+        <div class="progress-bar-gift"><div class="progress-fill-gift" id="giftFill"></div></div>
+        <p class="clicks-counter" id="clickCounter">0 / 20 clics</p>
+    </div>
+</div>
+
+<!-- App principal -->
+<div id="mainApp" class="main-app">
+    <div class="global-progress" id="globalProgress">
+        Progreso general: <span id="progressCount">0</span>/12 secciones<br>
+        <div class="global-bar-outer"><div class="global-bar-inner" id="globalBar"></div></div>
+    </div>
+
+    <div class="menu-grid" id="menuGrid"></div>
+
+    <!-- Reproductor global minimizado -->
+    <div id="globalPlayer" class="global-player">
+        <div class="player-controls">
+            <button id="globalPrev">⏮</button>
+            <button id="globalPlayPause">▶</button>
+            <button id="globalNext">⏭</button>
+        </div>
+        <span id="globalSongName">🎵 Canción</span>
+    </div>
+</div>
+
+<!-- Contenedor de modales de secciones -->
+<div id="modalContainer"></div>
+
+<script>
+    // ========== CONFIGURACIÓN PERSONALIZABLE ==========
+    const CLICS_NECESARIOS = 20;
+    const FECHA_INICIO_AMOR = "2025-03-18"; // Inicio del amor eterno
+
+    // MENÚ (12 secciones + sección 13 oculta)
+    const OPCIONES_MENU = [
+        { img: "assets/menu/opcion1.jpg", titulo: "Carta Romántica", seccion: 1, bloqueada: false },
+        { img: "assets/menu/opcion2.jpg", titulo: "Playlist Musical", seccion: 2, bloqueada: false },
+        { img: "assets/menu/opcion3.jpg", titulo: "Test de Amor", seccion: 3, bloqueada: false },
+        { img: "assets/menu/opcion4.jpg", titulo: "Juego RPG", seccion: 4, bloqueada: false },
+        { img: "assets/menu/opcion5.jpg", titulo: "Carta Interactiva", seccion: 5, bloqueada: false },
+        { img: "assets/menu/opcion6.jpg", titulo: "Paisaje Digital", seccion: 6, bloqueada: false },
+        { img: "assets/menu/opcion7.jpg", titulo: "Nuestro Universo", seccion: 7, bloqueada: false },
+        { img: "assets/menu/opcion8.jpg", titulo: "Jardín Secreto", seccion: 8, bloqueada: false },
+        { img: "assets/menu/opcion9.jpg", titulo: "Mapa del Amor", seccion: 9, bloqueada: false },
+        { img: "assets/menu/opcion10.jpg", titulo: "Caja 3D", seccion: 10, bloqueada: false },
+        { img: "assets/menu/opcion11.jpg", titulo: "Preguntas del Corazón", seccion: 11, bloqueada: false },
+        { img: "assets/menu/opcion12.jpg", titulo: "Carta Infinita", seccion: 12, bloqueada: false },
+        { img: "assets/menu/opcion13.jpg", titulo: "✨ Eterno Amor ✨", seccion: 13, bloqueada: true }
+    ];
+
+    // Playlist mínima 10 canciones (ejemplo con URLs demo)
+    const PLAYLIST = [
+        { name: "Canción 1 - Nuestro amor", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", imgFolder: "cancion1" },
+        { name: "Canción 2 - Eres tú", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", imgFolder: "cancion2" },
+        { name: "Canción 3 - Promesas", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", imgFolder: "cancion3" },
+        { name: "Canción 4 - Para siempre", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", imgFolder: "cancion4" },
+        { name: "Canción 5 - Mi vida", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", imgFolder: "cancion5" },
+        { name: "Canción 6 - Tu mirada", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", imgFolder: "cancion6" },
+        { name: "Canción 7 - Eternidad", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", imgFolder: "cancion7" },
+        { name: "Canción 8 - Contigo", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", imgFolder: "cancion8" },
+        { name: "Canción 9 - Te amo", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", imgFolder: "cancion9" },
+        { name: "Canción 10 - Eres mi todo", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", imgFolder: "cancion10" }
+    ];
+
+    // Variables de estado
+    let clicsHechos = 0;
+    let sectionsCompleted = Array(13).fill(false); // índice 1-12, 13 es especial
+    let currentSongIndex = 0;
+    let isPlaying = false;
+    let globalAudio = new Audio();
+    let globalProgress = 0;
+    let unlocked13 = false;
+
+    // Elementos DOM
+    const giftScreen = document.getElementById('giftScreen');
+    const mainApp = document.getElementById('mainApp');
+    const giftFill = document.getElementById('giftFill');
+    const clickCounterSpan = document.getElementById('clickCounter');
+    const giftCard = document.getElementById('giftCard');
+    const menuGrid = document.getElementById('menuGrid');
+    const globalProgressSpan = document.getElementById('progressCount');
+    const globalBar = document.getElementById('globalBar');
+    const globalPrev = document.getElementById('globalPrev');
+    const globalPlayPause = document.getElementById('globalPlayPause');
+    const globalNext = document.getElementById('globalNext');
+    const globalSongName = document.getElementById('globalSongName');
+    const modalContainer = document.getElementById('modalContainer');
+
+    // Helper: partículas al hacer clic
+    function spawnParticles(x, y) {
+        for (let i = 0; i < 8; i++) {
+            const el = document.createElement('div');
+            el.textContent = ['💗','💖','🌸','✨','🎀'][Math.floor(Math.random()*5)];
+            el.style.position = 'fixed';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.pointerEvents = 'none';
+            el.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            el.style.zIndex = '10000';
+            el.style.animation = `floatUp 1.5s ease-out forwards`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (mainApp.style.display !== 'block') return;
+        spawnParticles(e.clientX, e.clientY);
+    });
+
+    // Lógica del regalo
+    giftCard.addEventListener('click', () => {
+        if (clicsHechos < CLICS_NECESARIOS) {
+            clicsHechos++;
+            const percent = (clicsHechos / CLICS_NECESARIOS) * 100;
+            giftFill.style.width = percent + '%';
+            clickCounterSpan.innerText = `${clicsHechos} / ${CLICS_NECESARIOS} clics`;
+            if (clicsHechos === CLICS_NECESARIOS) {
+                // Abrir regalo
+                giftScreen.style.opacity = '0';
+                setTimeout(() => {
+                    giftScreen.style.display = 'none';
+                    mainApp.style.display = 'block';
+                    initMusic();
+                }, 800);
+            }
+        }
+    });
+
+    // Música global
+    function initMusic() {
+        loadSong(0);
+        globalAudio.volume = 0.5;
+        globalAudio.play().catch(e => console.log("auto-play bloqueado"));
+        isPlaying = true;
+        globalPlayPause.textContent = '⏸';
+        globalAudio.addEventListener('ended', () => {
+            nextSong();
+        });
+    }
+
+    function loadSong(index) {
+        currentSongIndex = (index + PLAYLIST.length) % PLAYLIST.length;
+        globalAudio.src = PLAYLIST[currentSongIndex].src;
+        globalSongName.textContent = PLAYLIST[currentSongIndex].name;
+        if (isPlaying) globalAudio.play();
+    }
+
+    function togglePlay() {
+        if (isPlaying) {
+            globalAudio.pause();
+            isPlaying = false;
+            globalPlayPause.textContent = '▶';
+        } else {
+            globalAudio.play();
+            isPlaying = true;
+            globalPlayPause.textContent = '⏸';
+        }
+    }
+
+    function nextSong() {
+        loadSong(currentSongIndex + 1);
+        if (isPlaying) globalAudio.play();
+    }
+
+    function prevSong() {
+        loadSong(currentSongIndex - 1);
+        if (isPlaying) globalAudio.play();
+    }
+
+    globalPrev.addEventListener('click', prevSong);
+    globalPlayPause.addEventListener('click', togglePlay);
+    globalNext.addEventListener('click', nextSong);
+
+    // Construir menú
+    function buildMenu() {
+        menuGrid.innerHTML = '';
+        OPCIONES_MENU.forEach((opt, idx) => {
+            const card = document.createElement('div');
+            card.className = 'menu-card';
+            if (opt.bloqueada && !unlocked13) card.classList.add('locked');
+            card.innerHTML = `<img src="${opt.img}" alt="${opt.titulo}" onerror="this.src='https://via.placeholder.com/60?text=📷'"><h3>${opt.titulo}</h3>`;
+            card.addEventListener('click', () => {
+                if (opt.bloqueada && !unlocked13) return;
+                openSection(opt.seccion);
+            });
+            menuGrid.appendChild(card);
+        });
+    }
+
+    // Abrir sección (modal genérico)
+    function openSection(secNum) {
+        // Por simplicidad, mostramos contenido según número
+        const modal = document.createElement('div');
+        modal.className = 'section-modal';
+        modal.innerHTML = `
+            <div class="section-content">
+                <button class="close-section">✖</button>
+                <h2>Sección ${secNum}</h2>
+                <div id="sectionContent${secNum}"></div>
+                <div class="achievement-panel" id="achievements${secNum}"></div>
+                <button class="back-menu">Volver al menú</button>
+            </div>
+        `;
+        modalContainer.appendChild(modal);
+        modal.style.display = 'flex';
+
+        // Cerrar
+        modal.querySelector('.close-section').onclick = () => modal.remove();
+        modal.querySelector('.back-menu').onclick = () => modal.remove();
+
+        const contentDiv = modal.querySelector(`#sectionContent${secNum}`);
+        const achievDiv = modal.querySelector(`#achievements${secNum}`);
+
+        // Contenido simulado según sección (por brevedad, solo sección 1,2 y 13 completas)
+        if (secNum === 1) {
+            contentDiv.innerHTML = `<p>Carta Romántica: Aquí iría tu carrusel de imágenes desde assets/carta/</p>
+            <div class="carousel-container" id="carouselSec1">
+                <img class="carousel-slide active" src="https://via.placeholder.com/300x400?text=Imagen+Romántica+1" style="width:100%;height:100%;object-fit:cover">
+                <button class="carousel-btn carousel-prev">❮</button>
+                <button class="carousel-btn carousel-next">❯</button>
+            </div>`;
+            // Logros
+            achievDiv.innerHTML = `<strong>Logros de sección 1 (completar todo):</strong>
+            <div class="achievement-item"><input type="checkbox" id="ach1_1"> Ver todas las imágenes</div>
+            <div class="achievement-item"><input type="checkbox" id="ach1_2"> Usar anterior/siguiente</div>
+            <div class="achievement-item"><input type="checkbox" id="ach1_3"> Clic en todos los dots</div>
+            <div class="achievement-item"><input type="checkbox" id="ach1_4"> Permanecer 30s</div>`;
+        } else if (secNum === 2) {
+            contentDiv.innerHTML = `<p>Playlist Musical (reproductor expandido)</p>
+            <button id="playPauseExpand">⏸</button> <button id="nextExpand">⏭</button>
+            <p>Canción actual: ${PLAYLIST[currentSongIndex].name}</p>`;
+            const playBtn = modal.querySelector('#playPauseExpand');
+            const nextBtn = modal.querySelector('#nextExpand');
+            if (playBtn) playBtn.onclick = togglePlay;
+            if (nextBtn) nextBtn.onclick = nextSong;
+        } else if (secNum === 13) {
+            // Sección especial con carrusel y contador
+            contentDiv.innerHTML = `
+                <h3>✨ ETERNO AMOR ✨</h3>
+                <p>💖 PARA SIEMPRE JUNTOS 💖</p>
+                <div class="carousel-container" id="carouselSec13">
+                    <img class="carousel-slide active" src="https://via.placeholder.com/300x400?text=Recuerdo+1" style="width:100%;height:100%;object-fit:cover">
+                    <img class="carousel-slide" src="https://via.placeholder.com/300x400?text=Recuerdo+2" style="width:100%;height:100%;object-fit:cover">
+                    <img class="carousel-slide" src="https://via.placeholder.com/300x400?text=Recuerdo+3" style="width:100%;height:100%;object-fit:cover">
+                    <button class="carousel-btn carousel-prev">❮</button>
+                    <button class="carousel-btn carousel-next">❯</button>
+                </div>
+                <div id="timeCounterDisplay" class="time-counter"></div>
+                <div id="loveMessage"></div>
+                <div class="deco-area">
+                    <span class="deco-clickable" data-msg="Eres mi sol">💖</span>
+                    <span class="deco-clickable" data-msg="Te amo infinito">∞</span>
+                    <span class="deco-clickable" data-msg="Contigo hasta el fin">✨</span>
+                </div>
+                <button id="downloadCert">📸 Guardar certificado</button>
+            `;
+            // Contador tiempo desde 2025-03-18
+            function updateCounter() {
+                const start = new Date(FECHA_INICIO_AMOR);
+                const now = new Date();
+                let diff = now - start;
+                const seconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+                const months = Math.floor(days / 30);
+                const years = Math.floor(months / 12);
+                document.getElementById('timeCounterDisplay').innerHTML = `
+                    <div class="time-unit"><div class="time-number">${years}</div>Años</div>
+                    <div class="time-unit"><div class="time-number">${months % 12}</div>Meses</div>
+                    <div class="time-unit"><div class="time-number">${days % 30}</div>Días</div>
+                    <div class="time-unit"><div class="time-number">${hours % 24}</div>Horas</div>
+                    <div class="time-unit"><div class="time-number">${minutes % 60}</div>Min</div>
+                    <div class="time-unit"><div class="time-number">${seconds % 60}</div>Seg</div>
+                `;
+                document.getElementById('loveMessage').innerHTML = `<p>💗 Hemos recorrido ${days} días juntos, y cada día te amo más. 💗</p>`;
+            }
+            updateCounter();
+            setInterval(updateCounter, 1000);
+
+            // Carrusel manual
+            let slides13 = modal.querySelectorAll('#carouselSec13 .carousel-slide');
+            let current13 = 0;
+            const showSlide13 = (n) => {
+                slides13.forEach((s, i) => s.classList.toggle('active', i === n));
+            };
+            modal.querySelector('.carousel-prev').onclick = () => { current13 = (current13 - 1 + slides13.length) % slides13.length; showSlide13(current13); };
+            modal.querySelector('.carousel-next').onclick = () => { current13 = (current13 + 1) % slides13.length; showSlide13(current13); };
+
+            // Adornos clickeables
+            modal.querySelectorAll('.deco-clickable').forEach(el => {
+                el.onclick = () => alert(el.getAttribute('data-msg'));
+            });
+
+            // Descargar certificado simulado
+            document.getElementById('downloadCert').onclick = () => {
+                alert("Certificado de amor eterno guardado (simulado)");
+            };
+        } else {
+            contentDiv.innerHTML = `<p>Contenido de la sección ${secNum} (personalizable)</p><p>Aquí iría todo el contenido interactivo.</p>`;
+        }
+
+        // Simular completado automático después de 5s (para demo, pero en real sería con interacciones)
+        if (!sectionsCompleted[secNum] && secNum <= 12) {
+            setTimeout(() => {
+                if (!sectionsCompleted[secNum]) {
+                    sectionsCompleted[secNum] = true;
+                    updateGlobalProgress();
+                }
+            }, 5000);
+        }
+    }
+
+    // Actualizar barra global
+    function updateGlobalProgress() {
+        let completed = 0;
+        for (let i = 1; i <= 12; i++) if (sectionsCompleted[i]) completed++;
+        globalProgress = (completed / 12) * 100;
+        globalProgressSpan.innerText = completed;
+        globalBar.style.width = globalProgress + '%';
+        if (completed === 12 && !unlocked13) {
+            unlocked13 = true;
+            alert("🎉✨ ¡HAS DESBLOQUEADO LA SECCIÓN ESPECIAL: ETERNO AMOR! ✨🎉");
+            buildMenu(); // Reconstruir menú para desbloquear opción 13
+        }
+    }
+
+    // Inicializar
+    function init() {
+        buildMenu();
+        // Corazones flotantes
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = ['💗','💖','💕','🌸','✨'][Math.floor(Math.random()*5)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 5 + 6) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 11000);
+        }, 800);
+    }
+    init();
+</script>
+</body>
+  </html>
